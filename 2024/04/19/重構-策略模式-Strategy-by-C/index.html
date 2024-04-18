@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/favicon.ico >
+    <title>
+        Hexo
+    </title>
+    <meta name="description" content= Hi all，我會在這邊放平時開發碰到的酷東西 或是 programing 心得，能夠從這邊拿到知識就拿吧！ >
+    <meta name="keywords" content= James-Hsueh, 地域列車車長, Coding, Programing, Devops, 薛華慶 >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+<meta name="generator" content="Hexo 7.2.0"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            [重構] 策略模式 Strategy by C#
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <p>Hi all, 由於近日 91蒞臨我們部門擔任為期一周的 coach，因此有了此次的機遇，整個被點醒的過程蠻讚的寫篇文章來記錄。</p>
+<img src="/2024/04/19/%E9%87%8D%E6%A7%8B-%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F-Strategy-by-C/title.png" class="">
+<hr>
+<p>事情是這樣，我跟另位同事盯著同個螢幕同段 code 大約半個鐘頭，但還是想不出可以 refactor 的方法 ，於是請教了 coach 91來幫我們解惑該如何重構這段 code。以下將透過遊戲職業來做這次的情境題，其中我們會有個 工廠類別 PlayerFactory 負責產出相對職業的物件，且職業物件皆實作 IPlayer介面 。以下是原始 code:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PlayerFactory</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> IPlayer <span class="title">Get</span>(<span class="params"><span class="built_in">int</span> level, <span class="built_in">string</span> weapon</span>)</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (level &gt;= <span class="number">10</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (weapon == <span class="string">&quot;sword&quot;</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> Warrior();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Archer();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> weapon <span class="keyword">switch</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">&quot;sword&quot;</span> =&gt; <span class="keyword">new</span> RookieWarrior(),</span><br><span class="line">            <span class="string">&quot;bow&quot;</span> =&gt; <span class="keyword">new</span> RookieArcher(),</span><br><span class="line">            _ =&gt; <span class="keyword">new</span> Rookie()</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>這個情境的商業邏輯是以 玩家的等級 以及 使用的武器 進行產生物件的評判標準，其中職業有…</p>
+<ul>
+<li>Warrior: 等級 ≥ 10，且使用劍</li>
+<li>Archer: 等級 ≥ 10，且使用弓</li>
+<li>RookieWarrior: 等級 &lt; 10，且使用劍</li>
+<li>RookieArcher: 等級 &lt; 10，且使用弓</li>
+<li>Rookie: 等級 &lt; 10</li>
+</ul>
+<h2 id="解題思路"><a href="#解題思路" class="headerlink" title="解題思路"></a>解題思路</h2><p>以上面這段 PlayerFactory 為例，可以發現輸出職業物件時，這些物件都會有自己的產生條件，而且他們都繼承同一個介面: IPlayer。所以我們其實可以讓這些物件自己去決定當下的情況是否需要產出物件本身。</p>
+<p>首先在IPalyer上新增個判斷用的 method: IsNeedToGenerate()，讓實作類別各自去實作</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title">IPlayer</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="built_in">int</span> <span class="title">AttackDamage</span>()</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="built_in">bool</span> <span class="title">IsNeedToGenerate</span>(<span class="params"><span class="built_in">int</span> level, <span class="built_in">string</span> weapon</span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此時我們就可以將各自職業的條件實作在這個 method上，以下以 Warrior 舉例。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Warrior</span> : <span class="title">IPlayer</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="built_in">int</span> <span class="title">AttackDamage</span>()</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">24</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="built_in">bool</span> <span class="title">IsNeedToGenerate</span>(<span class="params"><span class="built_in">int</span> level, <span class="built_in">string</span> weapon</span>)</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> level &gt;= <span class="number">10</span> &amp;&amp; weapon == <span class="string">&quot;sword&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>把判斷用的 method都實作完畢之後，理論上我們就可以透過物件來做判斷了。這個時候我們宣告一個 list 物件把這些職業包起來，透過 for-loop 讓所有的職業物件來判斷那個才是需要被產生的即可，code 如下</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PlayerFactory</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">readonly</span> List&lt;IPlayer&gt; _players =</span><br><span class="line">    [</span><br><span class="line">        <span class="keyword">new</span> Archer(),</span><br><span class="line">        <span class="keyword">new</span> Warrior(),</span><br><span class="line">        <span class="keyword">new</span> RookieArcher(),</span><br><span class="line">        <span class="keyword">new</span> RookieWarrior()</span><br><span class="line">    ];</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IPlayer <span class="title">Get</span>(<span class="params"><span class="built_in">int</span> level, <span class="built_in">string</span> weapon</span>)</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">var</span> player <span class="keyword">in</span> _players)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (player.IsNeedToGenerate(level, weapon))</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> player;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Rookie();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此次練習的專案任意門: <a target="_blank" rel="noopener" href="https://github.com/CodeMachine0121/Stragetory-Refactoring">GitHub Repository</a></p>
+
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: James-Hsueh 地獄列車車長 | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv">Unique Visitors: <span id="busuanzi_value_site_uv"></span></span>
+    
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="">
+<input type="hidden" id="valine_appKey" value="">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>
