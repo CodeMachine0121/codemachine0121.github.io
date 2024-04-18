@@ -11,7 +11,7 @@
         Hexo
     </title>
     <meta name="description" content= Hi all，我會在這邊放平時開發碰到的酷東西 或是 programing 心得，能夠從這邊拿到知識就拿吧！ >
-    <meta name="keywords" content= JamesHsueh,Coding, Programing, Devops, 薛華慶 >
+    <meta name="keywords" content= James-Hsueh, 地域列車車長, Coding, Programing, Devops, 薛華慶 >
     
 <link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
 
@@ -21,6 +21,14 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
 <meta name="generator" content="Hexo 7.2.0"></head>
 <body id="bodyx">
     <div class="hd posts">
@@ -56,19 +64,13 @@
 <p>到這邊我們已經可能正常的透過 docker 使用 bun了，但每次要使用 bun 都必須打這麼長一大串是蠻不友善的，於是我們可以在各自的 .bashrc&#x2F;.zshrc 寫下這個 function</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bun() &#123;</span><br><span class="line">  docker run -it - rm -w /app -v &quot;$(pwd)&quot;:/app -p 8080:8080 oven/bun bun &quot;$@&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>這樣一來我們的使用畫面就會像這樣</p>
-<img src="/2024/04/18/Use-Bun-with-Docker/result.png" class="" width="300" height="500">
-
-<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>透過上面流程，我們就可以透過 docker 把開發環境與我們的本機端環境做切割。但這個方法不侷限於使用 bun，同理的 python, nodejs, npm 等等都可透過這個方法去做環境區分，那麽這邊就先這樣囉。</p>
 
     </div>
 
     
-        <hr class="fhr">
-        <div id="vcomments"></div>
-    
 </div>
     <div class="footer" id="footer">
-    <p><h4>Copyright © 2020 | Author: James Hsueh 地獄列車車長 | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    <p><h4>Copyright © 2020 | Author: James-Hsueh 地獄列車車長 | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
     
         <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
