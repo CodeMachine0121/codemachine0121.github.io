@@ -56,14 +56,10 @@
 </ul>
 <p>依照上面的需求點可以這樣下指令</p>
 <p><code>$ docker run -it --rm -p 8080:8080 -w /app -v $(pwd):/app oven/bun bun &lt;custom-command&gt;</code></p>
-<p>透過上面的指令我們就可以來初始化 bun的專案，如圖</p>
-<img src="/2024/04/18/Use-Bun-with-Docker/init-project.png" class="">
-<p>另外再透過 docker 檢查 container是否有被刪除</p>
-<img src="/2024/04/18/Use-Bun-with-Docker/check-delete.png" class="">
-
 <p>到這邊我們已經可能正常的透過 docker 使用 bun了，但每次要使用 bun 都必須打這麼長一大串是蠻不友善的，於是我們可以在各自的 .bashrc&#x2F;.zshrc 寫下這個 function</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bun() &#123;</span><br><span class="line">  docker run -it - rm -w /app -v &quot;$(pwd)&quot;:/app -p 8080:8080 oven/bun bun &quot;$@&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>這樣一來我們的使用畫面就會像這樣</p>
+<p>這樣一來我們就可以使用指令初始化專案:  <code>$ bun init</code></p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>透過上面流程，我們就可以透過 docker 把開發環境與我們的本機端環境做切割。但這個方法不侷限於使用 bun，同理的 python, nodejs, npm 等等都可透過這個方法去做環境區分，那麽這邊就先這樣囉。</p>
 
     </div>
 
